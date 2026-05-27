@@ -3,7 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gym Comfort — Monitorização de Conforto Ambiental</title>
+<title>GymComfort — Monitorização de Conforto Ambiental para Ginásios</title>
+
+<!-- SEO -->
+<meta name="description" content="Sistema IoT + SaaS de monitorização de conforto ambiental para ginásios. Dashboard Web + App Android com Índice de Conforto do Ginásio (IPG) baseado em normas ISO e ASHRAE.">
+<meta name="keywords" content="GymComfort, ginásio, IoT, conforto ambiental, CO2, IPG, monitorização, qualidade do ar">
+<meta name="author" content="GymComfort — Diogo Teixeira, João Rebelo, José Cardoso">
+
+<!-- Open Graph (partilha em WhatsApp, LinkedIn, Teams) -->
+<meta property="og:title" content="GymComfort — Monitorização de Conforto Ambiental">
+<meta property="og:description" content="IoT + SaaS para ginásios. Dashboard em tempo real com IPG científico baseado em 4 normas internacionais.">
+<meta property="og:url" content="https://gymcomfort.pt">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_PT">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="GymComfort — Monitorização de Conforto Ambiental">
+<meta name="twitter:description" content="IoT + SaaS para ginásios. Dashboard em tempo real com IPG científico.">
+
+<!-- Favicon inline SVG (sem dependências externas) -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23080C14'/%3E%3Ctext x='50' y='70' font-family='Arial Black, sans-serif' font-size='60' font-weight='900' text-anchor='middle' fill='%2300E896'%3EG%3C/text%3E%3C/svg%3E">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -121,6 +142,7 @@
     font-weight: 700; font-size: 0.9rem; letter-spacing: 0.04em;
     text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;
     transition: all 0.2s; box-shadow: 0 0 30px rgba(0,232,150,0.3);
+    border: none; cursor: pointer; font-family: inherit;
   }
   .btn-primary:hover { background: #00FFa8; transform: translateY(-2px); box-shadow: 0 0 50px rgba(0,232,150,0.5); }
   .btn-secondary {
@@ -128,6 +150,7 @@
     padding: 0.85rem 2rem; border-radius: 6px;
     font-weight: 600; font-size: 0.9rem; letter-spacing: 0.04em;
     text-decoration: none; transition: all 0.2s;
+    display: inline-block;
   }
   .btn-secondary:hover { background: rgba(0,232,150,0.06); border-color: var(--green); }
 
@@ -154,6 +177,7 @@
     font-family: 'Bebas Neue', sans-serif;
     font-size: 5rem; line-height: 1; color: var(--green);
     text-shadow: 0 0 30px rgba(0,232,150,0.5);
+    transition: color 0.5s ease;
   }
   .ipg-class { font-size: 0.85rem; color: var(--muted); margin-top: 0.3rem; }
   .ipg-class strong { color: var(--green); }
@@ -164,7 +188,7 @@
     border-radius: 8px; padding: 0.75rem;
   }
   .sensor-name { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
-  .sensor-val { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 500; margin-top: 0.2rem; }
+  .sensor-val { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 500; margin-top: 0.2rem; transition: all 0.5s ease; }
   .sensor-bar { height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; margin-top: 0.5rem; }
   .sensor-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
   .s-temp .sensor-fill { background: #F59E0B; width: 72%; }
@@ -233,10 +257,6 @@
     border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; align-items: center; gap: 0.5rem;
   }
   .arch-card li::before { content: '›'; color: var(--green); font-size: 1rem; }
-  .arch-arrow {
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.5rem; color: rgba(0,232,150,0.3);
-  }
 
   /* IPG FORMULA */
   .ipg-bg { background: var(--bg); }
@@ -387,35 +407,180 @@
   .roi-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.6rem; }
   .roi-card p { font-size: 0.87rem; color: var(--muted); line-height: 1.65; }
 
-  /* CTA */
+  /* PRICING — NOVO */
+  .pricing-bg { background: var(--bg); }
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 1rem; }
+  .price-card {
+    background: var(--card); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px; padding: 2.5rem 2rem;
+    position: relative; transition: border-color 0.3s, transform 0.3s;
+  }
+  .price-card:hover { border-color: var(--border); transform: translateY(-4px); }
+  .price-card.featured {
+    border-color: var(--green); box-shadow: var(--glow);
+  }
+  .price-card.featured::before {
+    content: 'Mais Popular';
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--green); color: #080C14;
+    padding: 0.3rem 1rem; border-radius: 100px;
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .price-tag { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--green); margin-bottom: 0.6rem; font-weight: 600; }
+  .price-name { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.4rem; }
+  .price-desc { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem; }
+  .price-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem; color: var(--green); line-height: 1; margin-bottom: 0.3rem;
+  }
+  .price-value small { font-size: 1rem; color: var(--muted); margin-left: 0.3rem; }
+  .price-period { font-size: 0.75rem; color: var(--muted); margin-bottom: 1.8rem; }
+  .price-features { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 2rem; }
+  .price-features li { font-size: 0.88rem; color: var(--text); display: flex; align-items: flex-start; gap: 0.6rem; }
+  .price-features li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+  .price-cta {
+    display: block; text-align: center;
+    padding: 0.85rem; border-radius: 6px;
+    font-weight: 700; font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase;
+    text-decoration: none; transition: all 0.2s;
+  }
+  .price-card .price-cta {
+    background: rgba(0,232,150,0.08); color: var(--green);
+    border: 1px solid var(--border);
+  }
+  .price-card.featured .price-cta {
+    background: var(--green); color: #080C14; border: 1px solid var(--green);
+    box-shadow: 0 0 20px rgba(0,232,150,0.3);
+  }
+  .price-card .price-cta:hover { background: rgba(0,232,150,0.15); }
+  .price-card.featured .price-cta:hover { background: #00FFa8; transform: translateY(-1px); }
+
+  /* TEAM — NOVO */
+  .team-bg { background: var(--bg2); }
+  .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+  .team-card {
+    background: var(--card); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px; padding: 2.5rem 2rem;
+    text-align: center;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .team-card:hover { border-color: var(--border); transform: translateY(-4px); box-shadow: var(--glow); }
+  .team-avatar {
+    width: 90px; height: 90px; border-radius: 50%;
+    background: linear-gradient(135deg, rgba(0,232,150,0.15), rgba(37,99,235,0.1));
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; color: var(--green);
+    box-shadow: 0 0 30px rgba(0,232,150,0.2);
+  }
+  .team-name { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.3rem; }
+  .team-role {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--green); margin-bottom: 1rem; font-weight: 600;
+  }
+  .team-bio { font-size: 0.85rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.2rem; }
+  .team-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; }
+  .team-tag {
+    font-size: 0.7rem; padding: 0.25rem 0.6rem; border-radius: 4px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    color: var(--muted); font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* CTA / CONTACT FORM */
   .cta-section {
-    padding: 8rem 4rem;
+    padding: 7rem 4rem;
     background: var(--bg);
-    text-align: center; position: relative; overflow: hidden;
+    position: relative; overflow: hidden;
   }
   .cta-section::before {
     content: ''; position: absolute;
     top: 50%; left: 50%; transform: translate(-50%, -50%);
-    width: 600px; height: 600px; border-radius: 50%;
+    width: 800px; height: 800px; border-radius: 50%;
     background: radial-gradient(circle, rgba(0,232,150,0.06) 0%, transparent 70%);
     pointer-events: none;
   }
-  .cta-section h2 { font-size: clamp(3rem, 6vw, 5rem); margin-bottom: 1rem; }
-  .cta-section p { font-size: 1.1rem; color: var(--muted); margin-bottom: 2.5rem; }
-  .cta-grid { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; }
+  .cta-inner {
+    max-width: 1000px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+    position: relative; z-index: 1;
+  }
+  .cta-text h2 { font-size: clamp(2.5rem, 4vw, 4rem); margin-bottom: 1rem; }
+  .cta-text .accent { color: var(--green); }
+  .cta-text p { font-size: 1.05rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.5rem; }
+  .cta-points { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
+  .cta-points li { font-size: 0.95rem; color: var(--text); display: flex; align-items: flex-start; gap: 0.7rem; }
+  .cta-points li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+  .cta-form-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 2.5rem;
+    box-shadow: var(--glow);
+  }
+  .cta-form-box h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .cta-form-box .form-sub { font-size: 0.88rem; color: var(--muted); margin-bottom: 1.8rem; }
+  .form-field { margin-bottom: 1.1rem; }
+  .form-field label {
+    display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted); margin-bottom: 0.4rem; font-weight: 600;
+  }
+  .form-field input, .form-field textarea {
+    width: 100%; padding: 0.8rem 1rem;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px; color: var(--text); font-family: inherit; font-size: 0.92rem;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .form-field input:focus, .form-field textarea:focus {
+    outline: none; border-color: var(--green); background: rgba(255,255,255,0.05);
+  }
+  .form-field textarea { resize: vertical; min-height: 90px; }
+  .form-submit {
+    width: 100%; margin-top: 0.5rem;
+    padding: 1rem; border: none; border-radius: 6px;
+    background: var(--green); color: #080C14;
+    font-family: inherit; font-weight: 700; font-size: 0.95rem;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 0 30px rgba(0,232,150,0.25);
+  }
+  .form-submit:hover { background: #00FFa8; transform: translateY(-2px); box-shadow: 0 0 50px rgba(0,232,150,0.5); }
+  .form-direct {
+    margin-top: 1.2rem; text-align: center; font-size: 0.82rem; color: var(--muted);
+  }
+  .form-direct a { color: var(--green); text-decoration: none; font-weight: 500; }
+  .form-direct a:hover { text-decoration: underline; }
 
   /* FOOTER */
   footer {
+    background: var(--bg2);
     border-top: 1px solid rgba(255,255,255,0.06);
-    padding: 2.5rem 4rem;
+    padding: 3.5rem 4rem 1.5rem;
+    color: var(--muted);
+  }
+  .footer-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem;
+    margin-bottom: 2.5rem;
+  }
+  .footer-brand .footer-logo {
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem;
+    color: var(--green); letter-spacing: 0.08em; margin-bottom: 0.8rem;
+  }
+  .footer-brand .footer-logo span { color: var(--text); }
+  .footer-brand p { font-size: 0.88rem; line-height: 1.7; max-width: 320px; }
+  .footer-col h5 {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text); margin-bottom: 1rem; font-weight: 600;
+  }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+  .footer-col a { color: var(--muted); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+  .footer-col a:hover { color: var(--green); }
+  .footer-bottom {
+    max-width: 1200px; margin: 0 auto;
+    padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05);
     display: flex; justify-content: space-between; align-items: center;
-    color: var(--muted); font-size: 0.82rem;
+    font-size: 0.8rem; flex-wrap: wrap; gap: 1rem;
   }
-  .footer-logo {
-    font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem;
-    color: var(--green); letter-spacing: 0.08em;
-  }
-  .footer-logo span { color: var(--muted); }
+  .footer-bottom a { color: var(--green); text-decoration: none; }
 
   /* COMPETITION */
   .comp-bg { background: var(--bg2); }
@@ -481,11 +646,12 @@
     nav { padding: 1rem 1.5rem; }
     .nav-links { display: none; }
     section, .hero, .stats-bar, .cta-section, footer { padding-left: 1.5rem; padding-right: 1.5rem; }
-    .hero-inner, .ipg-layout, .feat-grid { grid-template-columns: 1fr; }
+    .hero-inner, .ipg-layout, .feat-grid, .cta-inner { grid-template-columns: 1fr; }
     .feat-card.wide { grid-column: span 1; }
-    .arch-grid, .alerts-grid, .stack-grid, .road-grid, .roi-grid, .prot-grid, .pos-grid { grid-template-columns: 1fr; }
+    .arch-grid, .alerts-grid, .stack-grid, .road-grid, .roi-grid, .prot-grid, .pos-grid, .pricing-grid, .team-grid { grid-template-columns: 1fr; }
     .road-grid::before { display: none; }
     .stats-bar { gap: 2rem; flex-wrap: wrap; }
+    .footer-inner { grid-template-columns: 1fr; gap: 2rem; }
   }
 </style>
 </head>
@@ -497,10 +663,11 @@
     <li><a href="#arquitetura">Arquitetura</a></li>
     <li><a href="#ipg">IPG</a></li>
     <li><a href="#funcionalidades">Funcionalidades</a></li>
+    <li><a href="#precos">Preços</a></li>
+    <li><a href="#equipa">Equipa</a></li>
     <li><a href="#concorrencia">Concorrência</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
   </ul>
-  <a href="#contacto" class="nav-cta">Ver Demo</a>
+  <a href="#contacto" class="nav-cta">Pedir Demo</a>
 </nav>
 
 <!-- HERO -->
@@ -511,8 +678,8 @@
       <h1>GYM<span class="accent">COMFORT</span></h1>
       <p class="hero-sub">Monitorização inteligente de conforto ambiental para ginásios. Dashboard Web + App Android com cálculo automático do Índice de Conforto do Ginásio (IPG).</p>
       <div class="hero-btns">
-        <a href="#ipg" class="btn-primary">Explorar o IPG →</a>
-        <a href="#arquitetura" class="btn-secondary">Ver Arquitetura</a>
+        <a href="#contacto" class="btn-primary">Pedir Demo Gratuita →</a>
+        <a href="#ipg" class="btn-secondary">Como funciona</a>
       </div>
     </div>
     <div class="ipg-widget">
@@ -522,27 +689,27 @@
         </div>
         <div class="ipg-live">AO VIVO</div>
       </div>
-      <div class="ipg-score">82</div>
-      <div class="ipg-class">Estado: <strong>Bom</strong> · Sala Principal</div>
+      <div class="ipg-score" id="ipg-score">82</div>
+      <div class="ipg-class">Estado: <strong id="ipg-class">Bom</strong> · Sala Principal</div>
       <div class="sensors-grid">
         <div class="sensor-item s-temp">
           <div class="sensor-name">Temperatura</div>
-          <div class="sensor-val" style="color:#F59E0B">22.4°C</div>
+          <div class="sensor-val" id="val-temp" style="color:#F59E0B">22.4°C</div>
           <div class="sensor-bar"><div class="sensor-fill"></div></div>
         </div>
         <div class="sensor-item s-co2">
           <div class="sensor-name">CO₂</div>
-          <div class="sensor-val" style="color:var(--green)">748 ppm</div>
+          <div class="sensor-val" id="val-co2" style="color:var(--green)">748 ppm</div>
           <div class="sensor-bar"><div class="sensor-fill"></div></div>
         </div>
         <div class="sensor-item s-noise">
           <div class="sensor-name">Ruído</div>
-          <div class="sensor-val" style="color:var(--teal)">63 dB</div>
+          <div class="sensor-val" id="val-noise" style="color:var(--teal)">63 dB</div>
           <div class="sensor-bar"><div class="sensor-fill"></div></div>
         </div>
         <div class="sensor-item s-light">
           <div class="sensor-name">Iluminação</div>
-          <div class="sensor-val" style="color:#A78BFA">680 lux</div>
+          <div class="sensor-val" id="val-light" style="color:#A78BFA">680 lux</div>
           <div class="sensor-bar"><div class="sensor-fill"></div></div>
         </div>
       </div>
@@ -697,11 +864,12 @@
     </div>
   </div>
 </section>
+
 <!-- SENSORES E IPG EXPLICADOS -->
 <section class="features-bg" id="sensores">
   <div class="section-inner">
     <div class="section-label">Sensores e Variáveis</div>
-    <h2>Sensores Monitorizados & O que é o IPG?</h2>
+    <h2>Sensores Monitorizados</h2>
     <p class="section-desc">
       O <strong>IPG (Índice de Conforto do Ginásio)</strong> é um indicador automático que reflete o nível de conforto ambiental dos espaços. É calculado a partir de múltiplas variáveis críticas, permitindo decisões rápidas para um ambiente mais saudável e eficiente.
     </p>
@@ -766,6 +934,7 @@
     </table>
   </div>
 </section>
+
 <!-- FUNCIONALIDADES -->
 <section class="features-bg" id="funcionalidades">
   <div class="section-inner">
@@ -949,12 +1118,70 @@
   </div>
 </section>
 
+<!-- PRICING — NOVA SECÇÃO -->
+<section class="pricing-bg" id="precos">
+  <div class="section-inner">
+    <div class="section-label">Planos e Preços</div>
+    <h2>Subscrição Mensal Acessível</h2>
+    <p class="section-desc">Três planos pensados para diferentes dimensões de ginásios. Sem custos de instalação ocultos. Cancele a qualquer momento.</p>
+    <div class="pricing-grid reveal">
+      <div class="price-card">
+        <div class="price-tag">Plano Basic</div>
+        <div class="price-name">Para começar</div>
+        <div class="price-desc">Ginásios pequenos até 100 sócios</div>
+        <div class="price-value">€50<small>/mês</small></div>
+        <div class="price-period">Faturação mensal · IVA não incluído</div>
+        <ul class="price-features">
+          <li>1 sensor + dashboard básico</li>
+          <li>Alertas por email (3 níveis)</li>
+          <li>Relatório mensal em PDF</li>
+          <li>Setup remoto em 4 horas</li>
+          <li>Suporte por email</li>
+        </ul>
+        <a href="#contacto" class="price-cta">Quero Saber Mais</a>
+      </div>
+      <div class="price-card featured">
+        <div class="price-tag">Plano Pro</div>
+        <div class="price-name">Mais escolhido</div>
+        <div class="price-desc">Ginásios médios 100-500 sócios</div>
+        <div class="price-value">€75<small>/mês</small></div>
+        <div class="price-period">Faturação mensal · IVA não incluído</div>
+        <ul class="price-features">
+          <li>Até 3 sensores + mapa de zonas</li>
+          <li>Dashboard avançado com tendências</li>
+          <li>Alertas SMS + email</li>
+          <li>Recomendações automáticas</li>
+          <li>App Android incluída</li>
+          <li>Suporte prioritário</li>
+        </ul>
+        <a href="#contacto" class="price-cta">Pedir Demo</a>
+      </div>
+      <div class="price-card">
+        <div class="price-tag">Plano Premium</div>
+        <div class="price-name">Sem limites</div>
+        <div class="price-desc">Grandes ginásios e cadeias</div>
+        <div class="price-value">€100<small>/mês</small></div>
+        <div class="price-period">Faturação mensal · IVA não incluído</div>
+        <ul class="price-features">
+          <li>Sensores ilimitados</li>
+          <li>Benchmarking entre ginásios</li>
+          <li>API para integração HVAC</li>
+          <li>Onboarding presencial</li>
+          <li>Suporte dedicado 24/7</li>
+          <li>SLA garantido</li>
+        </ul>
+        <a href="#contacto" class="price-cta">Falar com Equipa</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ROADMAP -->
 <section class="road-bg" id="roadmap">
   <div class="section-inner">
     <div class="section-label">Evolução</div>
     <h2>Roteiro de Desenvolvimento</h2>
-    <p class="section-desc">Plano estruturado de crescimento da plataforma, desde funcionalidades imediatas até Machine Learning e expansão multi-ginásio.</p>
+    <p class="section-desc">Plano estruturado de crescimento da plataforma, desde funcionalidades imediatas até Machine Learning e expansão Ibérica.</p>
     <div class="road-grid reveal" style="margin-top:3rem">
       <div class="road-col">
         <div class="road-marker">1</div>
@@ -986,7 +1213,7 @@
           <li>Machine Learning (Previsão)</li>
           <li>Controlo HVAC Automático</li>
           <li>Aplicação Nativa iOS</li>
-          <li>Expansão Multi-Ginásio</li>
+          <li>Expansão Ibérica (PT + ES)</li>
         </ul>
       </div>
     </div>
@@ -998,13 +1225,13 @@
   <div class="section-inner">
     <div class="section-label">Análise de Mercado</div>
     <h2>Comparação com a Concorrência</h2>
-    <p class="section-desc">O Gym Comfort é o único sistema com foco exclusivo em ginásios, combinando monitorização multi-sensor, IPG proprietário e ecossistema completo Web + Android.</p>
+    <p class="section-desc">O GymComfort é o único sistema com foco exclusivo em ginásios, combinando monitorização multi-sensor, IPG proprietário e ecossistema completo Web + Android.</p>
     <div class="comp-table-wrap reveal">
       <table class="comp-table">
         <thead>
           <tr>
             <th>Funcionalidade</th>
-            <th class="ours">Gym Comfort</th>
+            <th class="ours">GymComfort</th>
             <th>AirThings</th>
             <th>Awair</th>
             <th>uHoo</th>
@@ -1092,7 +1319,7 @@
   <div class="section-inner">
     <div class="section-label">Vantagens Competitivas</div>
     <h2>Factores de Protecção</h2>
-    <p class="section-desc">Seis barreiras estruturais que protegem a posição do Gym Comfort no mercado e dificultam a replicação por concorrentes.</p>
+    <p class="section-desc">Seis barreiras estruturais que protegem a posição do GymComfort no mercado e dificultam a replicação por concorrentes.</p>
     <div class="prot-grid reveal">
       <div class="prot-card">
         <div class="prot-icon">🔬</div>
@@ -1133,7 +1360,7 @@
   <div class="section-inner">
     <div class="section-label">Posicionamento Estratégico</div>
     <h2>Espaço Único no Mercado</h2>
-    <p class="section-desc">O Gym Comfort ocupa a zona de menor concorrência directa: solução especializada com funcionalidades avançadas.</p>
+    <p class="section-desc">O GymComfort ocupa a zona de menor concorrência directa: solução especializada com funcionalidades avançadas.</p>
     <div class="pos-grid reveal">
       <div class="pos-card">
         <div class="pos-num">01</div>
@@ -1157,24 +1384,96 @@
   </div>
 </section>
 
-<!-- CTA -->
+<!-- EQUIPA — NOVA SECÇÃO -->
+<section class="team-bg" id="equipa">
+  <div class="section-inner">
+    <div class="section-label">Equipa</div>
+    <h2>Quem Está por Trás</h2>
+    <p class="section-desc">Três fundadores com perfil técnico complementar: full-stack, IoT, UX e gestão de produto. Estudantes de Engenharia Informática e Redes na UMAIA.</p>
+    <div class="team-grid reveal">
+      <div class="team-card">
+        <div class="team-avatar">JR</div>
+        <div class="team-name">João Rebelo</div>
+        <div class="team-role">Backend & IoT</div>
+        <p class="team-bio">Full-Stack Developer responsável pelo backend, integração de sensores IoT e arquitetura técnica do GymComfort.</p>
+        <div class="team-tags">
+          <span class="team-tag">Node.js</span>
+          <span class="team-tag">PostgreSQL</span>
+          <span class="team-tag">Docker</span>
+          <span class="team-tag">IoT</span>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">DT</div>
+        <div class="team-name">Diogo Teixeira</div>
+        <div class="team-role">Frontend & UX</div>
+        <p class="team-bio">Frontend Developer focado em design de interface, dashboard, testes de usabilidade e fluxo de alertas.</p>
+        <div class="team-tags">
+          <span class="team-tag">React 18</span>
+          <span class="team-tag">Material-UI</span>
+          <span class="team-tag">UX Design</span>
+          <span class="team-tag">Recharts</span>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">JC</div>
+        <div class="team-name">José Cardoso</div>
+        <div class="team-role">Business & Product</div>
+        <p class="team-bio">Product Manager responsável pela estratégia comercial, validação de mercado, métricas e go-to-market.</p>
+        <div class="team-tags">
+          <span class="team-tag">Lean Startup</span>
+          <span class="team-tag">BMC</span>
+          <span class="team-tag">Agile</span>
+          <span class="team-tag">Sales</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA / FORMULÁRIO DE CONTACTO -->
 <section class="cta-section" id="contacto">
-  <div style="position:relative;z-index:1">
-    <div class="section-label" style="text-align:center">Gym Comfort</div>
-    <h2>Inovação e<br><span style="color:var(--green)">Bem-Estar</span></h2>
-    <p>Solução IoT integrada · Decisões baseadas em dados · Foco total no utilizador</p>
-    <div class="cta-grid">
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem 1.5rem;font-size:0.85rem;color:var(--muted)">
-        ✓ <strong style="color:var(--text)">Solução IoT Integrada</strong>
-      </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem 1.5rem;font-size:0.85rem;color:var(--muted)">
-        ✓ <strong style="color:var(--text)">Decisões Baseadas em Dados</strong>
-      </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem 1.5rem;font-size:0.85rem;color:var(--muted)">
-        ✓ <strong style="color:var(--text)">Escalabilidade e Eficiência</strong>
-      </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem 1.5rem;font-size:0.85rem;color:var(--muted)">
-        ✓ <strong style="color:var(--text)">Foco Total no Utilizador</strong>
+  <div class="cta-inner">
+    <div class="cta-text reveal">
+      <div class="section-label">Vamos falar</div>
+      <h2>Quer ver o<br><span class="accent">GymComfort</span><br>no seu ginásio?</h2>
+      <p>Preencha o formulário e a nossa equipa entra em contacto consigo em 48h para uma demonstração personalizada e sem compromisso.</p>
+      <ul class="cta-points">
+        <li>Demonstração de 30 minutos por videochamada</li>
+        <li>Análise gratuita do conforto ambiental do seu ginásio</li>
+        <li>Proposta personalizada à medida do seu espaço</li>
+        <li>Programa piloto com condições especiais</li>
+      </ul>
+    </div>
+    <div class="cta-form-box reveal">
+      <h3>Pedir Demonstração</h3>
+      <p class="form-sub">Resposta em 48h · Sem compromisso</p>
+      <!--
+        FORMSPREE: para receber os emails, o José cria conta gratuita em https://formspree.io
+        e substitui "YOUR_FORM_ID" pelo ID do formulário criado.
+        Em alternativa, o botão "Enviar por email" abaixo funciona já sem configuração.
+      -->
+      <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST" id="contact-form">
+        <div class="form-field">
+          <label for="nome">Nome</label>
+          <input type="text" id="nome" name="nome" required placeholder="O seu nome">
+        </div>
+        <div class="form-field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required placeholder="email@exemplo.com">
+        </div>
+        <div class="form-field">
+          <label for="ginasio">Ginásio</label>
+          <input type="text" id="ginasio" name="ginasio" required placeholder="Nome do seu ginásio">
+        </div>
+        <div class="form-field">
+          <label for="mensagem">Mensagem (opcional)</label>
+          <textarea id="mensagem" name="mensagem" placeholder="Quantos sócios, dimensão, dúvidas..."></textarea>
+        </div>
+        <button type="submit" class="form-submit">Pedir Demonstração →</button>
+      </form>
+      <div class="form-direct">
+        ou envie email direto para <a href="mailto:equipa@gymcomfort.pt?subject=Pedido%20de%20Demo%20GymComfort">equipa@gymcomfort.pt</a>
       </div>
     </div>
   </div>
@@ -1182,8 +1481,43 @@
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo">GYM<span>COMFORT</span></div>
-  <div style="color:var(--muted)">Monitorização de Conforto Ambiental para Ginásios</div>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">GYM<span>COMFORT</span></div>
+      <p>Sistema IoT + SaaS de monitorização de conforto ambiental para ginásios. Dashboard Web + App Android com Índice de Conforto do Ginásio (IPG) baseado em normas ISO e ASHRAE.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Produto</h5>
+      <ul>
+        <li><a href="#arquitetura">Arquitetura</a></li>
+        <li><a href="#ipg">IPG</a></li>
+        <li><a href="#funcionalidades">Funcionalidades</a></li>
+        <li><a href="#precos">Preços</a></li>
+        <li><a href="#roadmap">Roadmap</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Empresa</h5>
+      <ul>
+        <li><a href="#equipa">Equipa</a></li>
+        <li><a href="#concorrencia">Mercado</a></li>
+        <li><a href="#protecao">Vantagens</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Contacto</h5>
+      <ul>
+        <li><a href="mailto:equipa@gymcomfort.pt">equipa@gymcomfort.pt</a></li>
+        <li><a href="https://github.com/JCardoso-UMAIA/gymcomfort" target="_blank" rel="noopener">GitHub</a></li>
+        <li>UMAIA · Portugal 🇵🇹</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2026 GymComfort · Projeto académico UMAIA · Inovação e Empreendedorismo</div>
+    <div>Desenvolvido por João Rebelo, Diogo Teixeira & José Cardoso</div>
+  </div>
 </footer>
 
 <script>
@@ -1196,8 +1530,9 @@
   }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
   reveals.forEach(r => observer.observe(r));
 
-  // IPG score animation
-  const scoreEl = document.querySelector('.ipg-score');
+  // IPG score initial animation
+  const scoreEl = document.getElementById('ipg-score');
+  const classEl = document.getElementById('ipg-class');
   let current = 0; const target = 82;
   const interval = setInterval(() => {
     current += 2; if (current >= target) { current = target; clearInterval(interval); }
@@ -1211,6 +1546,56 @@
       requestAnimationFrame(() => { el.style.width = w; });
     });
   }, 500);
+
+  // FAKE LIVE — pequenas variações nos sensores para parecer real
+  function classifyIPG(score) {
+    if (score >= 85) return 'Excelente';
+    if (score >= 70) return 'Bom';
+    if (score >= 55) return 'Moderado';
+    if (score >= 40) return 'Baixo';
+    return 'Muito Baixo';
+  }
+
+  let liveTemp = 22.4, liveCO2 = 748, liveNoise = 63, liveLight = 680, liveIPG = 82;
+
+  function tickLive() {
+    // Pequenas variações realistas
+    liveTemp = +(liveTemp + (Math.random() - 0.5) * 0.4).toFixed(1);
+    liveCO2 = Math.round(liveCO2 + (Math.random() - 0.5) * 30);
+    liveNoise = Math.round(liveNoise + (Math.random() - 0.5) * 4);
+    liveLight = Math.round(liveLight + (Math.random() - 0.5) * 25);
+    liveIPG = Math.max(60, Math.min(95, Math.round(liveIPG + (Math.random() - 0.5) * 4)));
+
+    // Limites realistas
+    liveTemp = Math.max(20, Math.min(25, liveTemp));
+    liveCO2 = Math.max(600, Math.min(950, liveCO2));
+    liveNoise = Math.max(55, Math.min(75, liveNoise));
+    liveLight = Math.max(550, Math.min(800, liveLight));
+
+    document.getElementById('val-temp').textContent = liveTemp + '°C';
+    document.getElementById('val-co2').textContent = liveCO2 + ' ppm';
+    document.getElementById('val-noise').textContent = liveNoise + ' dB';
+    document.getElementById('val-light').textContent = liveLight + ' lux';
+    scoreEl.textContent = liveIPG;
+    classEl.textContent = classifyIPG(liveIPG);
+  }
+
+  // Começa a "live update" 3 segundos após o load (depois da animação inicial)
+  setTimeout(() => { setInterval(tickLive, 4000); }, 3000);
+
+  // Formulário — fallback se Formspree não estiver configurado
+  document.getElementById('contact-form').addEventListener('submit', function(e) {
+    const action = this.getAttribute('action');
+    if (action.includes('YOUR_FORM_ID')) {
+      e.preventDefault();
+      const nome = document.getElementById('nome').value;
+      const email = document.getElementById('email').value;
+      const ginasio = document.getElementById('ginasio').value;
+      const mensagem = document.getElementById('mensagem').value;
+      const body = `Nome: ${nome}%0AEmail: ${email}%0AGinásio: ${ginasio}%0A%0AMensagem:%0A${mensagem}`;
+      window.location.href = `mailto:equipa@gymcomfort.pt?subject=Pedido%20de%20Demo%20-%20${encodeURIComponent(ginasio)}&body=${body}`;
+    }
+  });
 </script>
 </body>
 </html>
